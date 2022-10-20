@@ -1,0 +1,19 @@
+@startuml crazy candle simulator
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title "Crazy Candle Context Diagram"
+
+
+Person(client, "Client")
+
+System(candle_system, "Crazy Candle System", "Allows client view candle graph and program automatic buy/sell operations")
+System(candle_generator_system, "Crazy Candle Generator System", "Generates random candle values")
+
+
+Rel(client, candle_system, "Uses", "Socket/TCP", "Gets real time candle values")
+Rel(client, candle_system, "Uses", "HTTPS", "Register buy/sell operations")
+
+Rel(candle_system, candle_generator_system, "Get candle values", "AMQP",)
+
+@enduml
