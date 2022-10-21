@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -18,13 +19,15 @@ type CandleGenerator struct {
 	interval time.Duration
 	maxValue int
 	minValue int
+	producer *AmqpProducer
 }
 
-func NewCandleGenerator(interval time.Duration, max int, min int) *CandleGenerator {
+func NewCandleGenerator(interval time.Duration, max int, min int, producer *AmqpProducer) *CandleGenerator {
 	return &CandleGenerator{
 		interval: interval,
 		maxValue: max,
 		minValue: min,
+		producer: producer,
 	}
 }
 
@@ -52,6 +55,18 @@ func (g *CandleGenerator) Start() {
 
 		fmt.Printf("['%d', %d, %d, %d, %d],\n", time.Now().Unix(), int(candle.Opening), int(candle.Highest), int(candle.Lowest), int(candle.Closing))
 
+		candleJson, err := json.Marshal(candle)
+
+		if err != nil {
+			fmt.Println(err.Error())
+			time.Sleep(g.interval)
+			continue
+		}
+
+		err = g.producer.SendMessage(candleJson)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 		time.Sleep(g.interval)
 	}
 }
