@@ -17,7 +17,11 @@ func main() {
 
 	queue := getQueue(ch)
 
-	consumer := internal.NewAmqpConsumer(ch, &queue, internal.HandleNewCandleMessage(newCandleChannel))
+	mongoRepository := internal.NewMongoRepository()
+	mongoRepository.Connect()
+	defer mongoRepository.Disconnect()
+
+	consumer := internal.NewAmqpConsumer(ch, &queue, internal.HandleNewCandleMessage(newCandleChannel, mongoRepository))
 
 	go consumer.Consume()
 
