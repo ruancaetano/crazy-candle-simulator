@@ -38,7 +38,7 @@ function addNewCandleDataPoint(candle) {
 }
 
 (async () => {
-    result = await fetch("http://localhost:8080/candles")
+    result = await fetch("http://127.0.0.1:8080/candles")
         .then(response => response.json())
         .then(candles => {
             return candles.map(candle => ({
