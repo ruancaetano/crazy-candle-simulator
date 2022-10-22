@@ -14,31 +14,39 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func HandleWebsocketRequest(channel chan entities.Candle) func(w http.ResponseWriter, r *http.Request) {
+type WebSocketController struct {
+	channel chan entities.Candle
+}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+func NewWebSocketController(channel chan entities.Candle) *WebSocketController {
+	return &WebSocketController{
+		channel,
+	}
+}
 
-		conn, err := upgrader.Upgrade(w, r, nil)
+func (c *WebSocketController) Execute(w http.ResponseWriter, r *http.Request) {
+
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println("Client Successfully Connected")
+
+	for {
+		candle := <-c.channel
+
+		candleJson, _ := json.Marshal(candle)
+
+		err := conn.WriteMessage(websocket.TextMessage, candleJson)
 
 		if err != nil {
-			log.Println(err)
+			break
 		}
 
-		log.Println("Client Successfully Connected")
-
-		for {
-			candle := <-channel
-
-			candleJson, _ := json.Marshal(candle)
-
-			err := conn.WriteMessage(websocket.TextMessage, candleJson)
-
-			if err != nil {
-				break
-			}
-
-		}
 	}
 
 }

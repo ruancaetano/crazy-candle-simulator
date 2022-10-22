@@ -5,6 +5,7 @@ import (
 	internalAmqp "githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp"
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp/handler"
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/entities"
+	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/repositories"
 	"log"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	amqpConnection.Connect()
 	defer amqpConnection.Disconnect()
 
-	mongoRepository := internal.NewMongoRepository()
+	mongoRepository := repositories.NewMongoRepository()
 	mongoRepository.Connect()
 	defer mongoRepository.Disconnect()
 
@@ -26,7 +27,7 @@ func main() {
 	)
 	go consumer.Consume()
 
-	server := internal.NewServer(newCandleChannel)
+	server := internal.NewServer(newCandleChannel, mongoRepository)
 	err := server.Listen(":8080")
 
 	if err != nil {
