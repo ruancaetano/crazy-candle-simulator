@@ -9,20 +9,43 @@ import (
 
 func main() {
 
+	conn := connectAmqpServer()
+	defer conn.Close()
+
+	ch := getAmqpChannel(conn)
+	defer ch.Close()
+
+	queue := getQueue(ch)
+
+	producer := internal.NewProducer("candle.generated", ch, &queue)
+
+	generator := internal.NewCandleGenerator(time.Second, 0, 1000, producer)
+
+	generator.Start()
+}
+
+func connectAmqpServer() *amqp.Connection {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		panic(err.Error())
 	}
-	defer conn.Close()
 
+	return conn
+
+}
+
+func getAmqpChannel(conn *amqp.Connection) *amqp.Channel {
 	ch, err := conn.Channel()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	defer ch.Close()
+	return ch
 
-	err = ch.ExchangeDeclare("candle.generated", "fanout", true, false, false, false, nil)
+}
+
+func getQueue(ch *amqp.Channel) amqp.Queue {
+	err := ch.ExchangeDeclare("candle.generated", "fanout", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -37,9 +60,5 @@ func main() {
 		panic(err.Error())
 	}
 
-	producer := internal.NewProducer("candle.generated", ch, &queue)
-
-	generator := internal.NewCandleGenerator(time.Second, 0, 1000, producer)
-
-	generator.Start()
+	return queue
 }
