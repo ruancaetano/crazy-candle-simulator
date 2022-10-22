@@ -17,9 +17,6 @@ let chart = new CanvasJS.Chart("chartContainer", {
         prefix: "C$",
         title: "Price"
     },
-    toolTip: {
-        content: "Date: {x}<br /><strong>Price:</strong><br />Open: {y[0]}, Close: {y[3]}<br />High: {y[1]}, Low: {y[2]}"
-    },
     data: [{
         type: "candlestick",
         yValueFormatString: "C$##0.00",
@@ -33,9 +30,24 @@ function addNewCandleDataPoint(candle) {
         y: [candle.opening, candle.highest, candle.lowest, candle.closing]
     })
 
-    if (dataPoints.length === 50) {
+    if (dataPoints.length >= 60) {
         dataPoints.shift()
     }
 
     chart.render()
 }
+
+(async () => {
+    result = await fetch("http://localhost:8080/candles")
+        .then(response => response.json())
+        .then(candles => {
+            return candles.map(candle => ({
+                x: new Date(candle.timestamp),
+                y: [candle.opening, candle.highest, candle.lowest, candle.closing]
+            }))
+        }).catch(() => [])
+
+    console.log(result.slice(0, 1))
+    dataPoints.push(...result)
+})()
+
