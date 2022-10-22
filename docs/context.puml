@@ -2,18 +2,20 @@
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
+AddRelTag("async", $lineStyle = DashedLine())
+
 title "Crazy Candle Context Diagram"
 
 
 Person(client, "Client")
 
-System(candle_system, "Crazy Candle System", "Allows client view candle graph and program automatic buy/sell operations")
+System(candle_system, "Crazy Candle System", "Allows client view  real-time candle graph")
 System(candle_generator_system, "Crazy Candle Generator System", "Generates random candle values")
 
 
-Rel(client, candle_system, "Uses", "Socket/TCP", "Gets real time candle values")
-Rel(client, candle_system, "Uses", "HTTPS", "Register buy/sell operations")
+Rel(client, candle_system, "Uses", "Socket/TCP", "Gets real time candle values", $tags = "async")
+Rel(client, candle_system, "Uses", "HTTPS", "Get initial values")
 
-Rel(candle_system, candle_generator_system, "Get candle values", "AMQP",)
+Rel(candle_system, candle_generator_system, "Get generated candle values", "AMQP", $tags = "async")
 
 @enduml

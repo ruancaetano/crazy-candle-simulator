@@ -12,17 +12,17 @@ Person(client, "Client")
 
 
 System_Boundary(boundary, "Crazy candle system") {
-    Container(web_container, "Web page", "React", "Allows client view candle graph and program automatic buy/sell operations")
-    Container(api_container, "Candle API", "Go", "Provides real time candle values and functionality to manage buy/sell operations")
+    Container(web_container, "Web page", "HTML/CSS/JS", "Allows client view real time candle graph")
+    Container(api_container, "Candle API", "Go", "Provides real time candle values")
     Container(generator_container, "Candle Generator", "Go", "Generates random candle values")
-    ContainerDb(database, "Candle Database", "Mongo", "Stores candle values, buy/sell optiosn and transactions history")
+    ContainerDb(database, "Candle Database", "Mongo", "Stores candle history")
 }
 
-Rel(client, web_container, "Uses", "HTTPS", "Views real time crazy candle graph and program buy/sell operations")
+Rel(client, web_container, "Uses", "HTTPS", "Views real time crazy candle graph")
 
-Rel(web_container, api_container, "Uses", "HTTPS", "Register buy/sell operations")
-Rel(web_container, api_container, "Uses", "Socket/TCP", "Get real time informations")
+Rel(web_container, api_container, "Uses", "HTTPS", "Get initial informations")
+Rel(web_container, api_container, "Uses", "Socket/TCP", "Get real time informations", $tags = "async")
 
-Rel(api_container, generator_container, "Get candle values", "RabitMQ", $tags = "async")
-Rel(api_container, database, "Uses", "MongoDb Driver",)
+Rel(api_container, generator_container, "Get generated candle values", "RabitMQ", $tags = "async")
+Rel(api_container, database, "Stores/Gets candle history", "MongoDb Driver",)
 @enduml
