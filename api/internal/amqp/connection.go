@@ -22,17 +22,17 @@ func (c *AmqpConnection) Connect() {
 		panic(err.Error())
 	}
 
-	err = ch.ExchangeDeclare("entities.generated", "fanout", true, false, false, false, nil)
+	err = ch.ExchangeDeclare("candle.generated", "fanout", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	queue, err := ch.QueueDeclare("entities-generated-queue", true, false, false, false, nil)
+	queue, err := ch.QueueDeclare("candle-generated-queue", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	err = ch.QueueBind(queue.Name, "", "entities.generated", false, nil)
+	err = ch.QueueBind(queue.Name, "", "candle.generated", false, nil)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -22,6 +22,10 @@ func NewGetCandlesController(repository *repositories.MongoRepository) *GetCandl
 }
 
 func (c *GetCandlesController) Execute(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+
 	collection := c.repository.Client.Database("crazy-candles").Collection("candles")
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
