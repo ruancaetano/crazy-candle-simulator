@@ -19,7 +19,7 @@ func NewMongoRepository() *MongoRepository {
 
 func (r *MongoRepository) Connect() {
 	log.Println("Connecting to mongodb")
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://root:development@127.0.0.1:27017/"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://root:development@mongo:27017/"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   # Create service with RabbitMQ.
-  message-broker:
+  broker:
     image: rabbitmq:3-management-alpine
     container_name: crazy-candle-broker
     ports:
@@ -31,3 +31,41 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: development
       ME_CONFIG_MONGODB_URL: mongodb://root:development@mongo:27017/
+
+  generator:
+    build:
+      context: ./generator
+    container_name: crazy-candle-generator
+    command: sh -c "./wait && ./run"
+    environment:
+      WAIT_HOSTS: broker:5672
+      WAIT_TIMEOUT: 60
+    depends_on:
+      - broker
+
+  api:
+    build:
+      context: ./api
+    container_name: crazy-candle-api
+    command: sh -c "./wait && ./server"
+    ports:
+      - 8080:8080
+    environment:
+      WAIT_HOSTS: broker:5672, mongo:27017 
+      WAIT_TIMEOUT: 60
+    depends_on:
+      - generator
+      - mongo
+
+
+  web:
+    build:
+      context: ./web
+    container_name: crazy-candle-web
+    command: sh -c "./wait && nginx -g 'daemon off;'"
+    ports:
+      - 80:80
+    environment:
+      WAIT_HOSTS: api:8080
+    depends_on:
+        - api

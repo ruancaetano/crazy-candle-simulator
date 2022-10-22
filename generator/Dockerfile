@@ -1,0 +1,19 @@
+FROM golang:1.19.0-alpine as builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN go build -o ./bin/run ./cmd/run.go
+
+
+FROM golang:1.19.0-alpine as runner
+
+WORKDIR /app
+
+COPY --from=builder ./app/bin/run .
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait ./wait
+RUN chmod +x ./wait
+
+CMD ./run

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"githbub.com/ruancaetano/crazy-candle-simulator/generator/internal"
 	"time"
+
+	"githbub.com/ruancaetano/crazy-candle-simulator/generator/internal"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -25,7 +26,7 @@ func main() {
 }
 
 func connectAmqpServer() *amqp.Connection {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@broker:5672/")
 	if err != nil {
 		panic(err.Error())
 	}

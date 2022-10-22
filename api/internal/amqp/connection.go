@@ -12,7 +12,7 @@ func NewAmqpConnection() *AmqpConnection {
 }
 
 func (c *AmqpConnection) Connect() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@broker:5672/")
 	if err != nil {
 		panic(err.Error())
 	}

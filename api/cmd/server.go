@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal"
 	internalAmqp "githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp"
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp/handler"
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/entities"
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/repositories"
-	"log"
 )
 
 func main() {
