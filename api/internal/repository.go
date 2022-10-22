@@ -10,7 +10,7 @@ import (
 )
 
 type MongoRepository struct {
-	client *mongo.Client
+	Client *mongo.Client
 }
 
 func NewMongoRepository() *MongoRepository {
@@ -30,11 +30,11 @@ func (r *MongoRepository) Connect() {
 		log.Fatal(err)
 	}
 
-	r.client = client
+	r.Client = client
 }
 
 func (r *MongoRepository) Disconnect() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	return r.client.Disconnect(ctx)
+	return r.Client.Disconnect(ctx)
 }

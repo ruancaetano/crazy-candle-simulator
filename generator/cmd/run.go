@@ -17,7 +17,7 @@ func main() {
 
 	queue := getQueue(ch)
 
-	producer := internal.NewProducer("candle.generated", ch, &queue)
+	producer := internal.NewProducer("entities.generated", ch, &queue)
 
 	generator := internal.NewCandleGenerator(time.Second, 0, 1000, producer)
 
@@ -45,17 +45,17 @@ func getAmqpChannel(conn *amqp.Connection) *amqp.Channel {
 }
 
 func getQueue(ch *amqp.Channel) amqp.Queue {
-	err := ch.ExchangeDeclare("candle.generated", "fanout", true, false, false, false, nil)
+	err := ch.ExchangeDeclare("entities.generated", "fanout", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	queue, err := ch.QueueDeclare("candle-generated-queue", true, false, false, false, nil)
+	queue, err := ch.QueueDeclare("entities-generated-amqp", true, false, false, false, nil)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	err = ch.QueueBind(queue.Name, "", "candle.generated", false, nil)
+	err = ch.QueueBind(queue.Name, "", "entities.generated", false, nil)
 	if err != nil {
 		panic(err.Error())
 	}

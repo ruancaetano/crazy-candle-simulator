@@ -1,4 +1,4 @@
-package internal
+package amqp
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -25,7 +25,7 @@ func (c *AmqpConsumer) Consume() {
 	forever := make(chan bool)
 
 	messages, err := c.channel.Consume(
-		c.queue.Name, // queue
+		c.queue.Name, // amqp
 		"",           // consumer
 		true,         // auto-ack
 		false,        // exclusive

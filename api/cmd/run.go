@@ -2,27 +2,28 @@ package main
 
 import (
 	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal"
-	amqp "github.com/rabbitmq/amqp091-go"
+	internalAmqp "githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp"
+	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/amqp/handler"
+	"githbub.com/ruancaetano/crazy-candle-simulator/api/internal/entities"
 	"log"
 )
 
 func main() {
-	newCandleChannel := make(chan internal.Candle)
+	newCandleChannel := make(chan entities.Candle)
 
-	conn := connectAmqpServer()
-	defer conn.Close()
-
-	ch := getAmqpChannel(conn)
-	defer ch.Close()
-
-	queue := getQueue(ch)
+	amqpConnection := internalAmqp.NewAmqpConnection()
+	amqpConnection.Connect()
+	defer amqpConnection.Disconnect()
 
 	mongoRepository := internal.NewMongoRepository()
 	mongoRepository.Connect()
 	defer mongoRepository.Disconnect()
 
-	consumer := internal.NewAmqpConsumer(ch, &queue, internal.HandleNewCandleMessage(newCandleChannel, mongoRepository))
-
+	consumer := internalAmqp.NewAmqpConsumer(
+		amqpConnection.Channel,
+		&amqpConnection.Queue,
+		handler.HandleNewCandleMessage(newCandleChannel, mongoRepository),
+	)
 	go consumer.Consume()
 
 	server := internal.NewServer(newCandleChannel)
@@ -32,43 +33,4 @@ func main() {
 		log.Fatal(err)
 	}
 
-}
-
-func connectAmqpServer() *amqp.Connection {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return conn
-
-}
-
-func getAmqpChannel(conn *amqp.Connection) *amqp.Channel {
-	ch, err := conn.Channel()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return ch
-
-}
-
-func getQueue(ch *amqp.Channel) amqp.Queue {
-	err := ch.ExchangeDeclare("candle.generated", "fanout", true, false, false, false, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	queue, err := ch.QueueDeclare("candle-generated-queue", true, false, false, false, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	err = ch.QueueBind(queue.Name, "", "candle.generated", false, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return queue
 }
