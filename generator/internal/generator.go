@@ -9,10 +9,11 @@ import (
 )
 
 type Candle struct {
-	Opening float64 `json:"opening"`
-	Closing float64 `json:"closing"`
-	Lowest  float64 `json:"lowest"`
-	Highest float64 `json:"highest"`
+	Timestamp time.Time `json:"timestamp"`
+	Opening   float64   `json:"opening"`
+	Closing   float64   `json:"closing"`
+	Lowest    float64   `json:"lowest"`
+	Highest   float64   `json:"highest"`
 }
 
 type CandleGenerator struct {
@@ -47,13 +48,12 @@ func (g *CandleGenerator) Start() {
 		}
 
 		candle := &Candle{
-			Lowest:  lowAndHighValues[0],
-			Highest: lowAndHighValues[1],
-			Opening: openAndCloseValues[0],
-			Closing: openAndCloseValues[1],
+			Timestamp: time.Now(),
+			Lowest:    lowAndHighValues[0],
+			Highest:   lowAndHighValues[1],
+			Opening:   openAndCloseValues[0],
+			Closing:   openAndCloseValues[1],
 		}
-
-		fmt.Printf("['%d', %d, %d, %d, %d],\n", time.Now().Unix(), int(candle.Opening), int(candle.Highest), int(candle.Lowest), int(candle.Closing))
 
 		candleJson, err := json.Marshal(candle)
 
