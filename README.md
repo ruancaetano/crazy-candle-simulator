@@ -36,4 +36,4 @@ The following accesses are also available:
 
 **RabbitMq Manager** via the url `http://localhost:15672/`, using guest/guest credentials
 
-**MongoDb Express** via the url `http://localhost:8081/
+**MongoDb Express** via the url `http://localhost:8081/`
